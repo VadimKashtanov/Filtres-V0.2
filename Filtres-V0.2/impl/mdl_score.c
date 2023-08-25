@@ -35,8 +35,13 @@ float score(Mdl_t * mdl) {
 	float gain;
 	float score = 0;
 	//
-	for (uint i=DEPART; i < N; i++) {
-		gain = f(mdl, depart) * (p1/p0 - 1) * LEVIER;
+	float p1, p0;
+	//
+	for (uint i=DEPART; i < PRIXS-1; i++) {
+		p1 = prixs[i+1];
+		p0 = prixs[i];
+		//
+		gain = f(mdl, i) * (p1/p0 - 1) * LEVIER;
 		score += gain;
 
 		if (i % ALPHA_TOUT_LES == 0) {
@@ -44,9 +49,9 @@ float score(Mdl_t * mdl) {
 		};
 
 		if (i % OPTI_TOUT_LES == 0) {
-			df(mdl, depart, +gain);
+			df(mdl, i, +gain);
 			for (uint p=0; p < mdl->poids; p++)
-				mdl->poid -= alpha * mdl->d_poid[i];
+				mdl->poid[p] -= alpha * mdl->d_poid[p];
 		}
 	}
 	//

@@ -26,7 +26,7 @@ typedef struct {
 	uint constantes, poids;
 	float * constante;	//selection naturelle
 	float * poid;		// -f'(x)
-
+ 
 	//	Les espaces de calcule F(x) et retro-propagation F'(x)
 	uint vars, locds;
 	float * var;

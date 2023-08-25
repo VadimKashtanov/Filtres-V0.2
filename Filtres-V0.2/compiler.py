@@ -58,14 +58,14 @@ else:
 if not 'prog' in listdir():
 	a_compiler = sommes
 
-SDL_FLAGS = "" #" -mavx -g" #"-lSDL2 -lSDL2main -lSDL2_ttf `sdl2-config --cflags --libs`"
+SDL_FLAGS = " -g " #"-O3" #" -mavx -g" #"-lSDL2 -lSDL2main -lSDL2_ttf `sdl2-config --cflags --libs`"
 
 print(f"[***] {len(a_compiler)}/{len(sommes)} fichiers a compiler")
 if len(a_compiler) == 0:
 	exit(0)
 for _a_compiler in a_compiler:
 	nom_fichier = _a_compiler.split('/')[-1]
-	e = system(f"gcc -O3 -c {_a_compiler} -Idef -lm " + SDL_FLAGS)
+	e = system(f"gcc -c {_a_compiler} -Idef -lm" + SDL_FLAGS)
 	if e != 0: exit(1)
 	system(f"mv {nom_fichier.replace('.c','.o')} bin/{_a_compiler.replace('/','_').replace('.c','.o')}")
 

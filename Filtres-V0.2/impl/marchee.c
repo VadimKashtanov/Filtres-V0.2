@@ -31,7 +31,10 @@ void charger_les_prixs() {
 
 	//	Chargement des Prixs et calcule des EMA, Moyennes Mouvantes
 	FILE * fp = fopen("prixs/prixs.bin", "rb");
-	fseek(fp, sizeof(float), 1);
+	assert(fp != 0);
+	uint __PRIXS;
+	fread(&__PRIXS, sizeof(uint), 1, fp);
+	assert(__PRIXS == PRIXS);
 	fread(prixs, sizeof(float), PRIXS, fp);
 	fclose(fp);
 	//

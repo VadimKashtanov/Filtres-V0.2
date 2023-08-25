@@ -13,8 +13,12 @@ fi
 #	Executer
 printf "[\033[95m***\033[0m] ========= Execution du programme =========\n"
 
-#gdb 
-#time
-./prog
-
 #valgrind --leak-check=yes --track-origins=yes ./prog
+time ./prog
+if [ $? -ne 0 ]
+then
+	printf "[***] Erreur durant l'execution.\n"
+	#valgrind --leak-check=yes --track-origins=yes ./prog
+	systemd-run --scope -p MemoryMax=100M gdb ./prog
+	exit
+fi
