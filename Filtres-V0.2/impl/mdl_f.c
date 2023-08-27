@@ -223,3 +223,13 @@ void df(Mdl_t * mdl, uint depart, float erreur) {
 		}
 	}
 };
+
+float objectif_gain(Mdl_t * mdl, uint depart) {
+	float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+	return powf(f(mdl, depart)*tmp-fabs(tmp), 2)/2;
+};
+
+void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain) {
+	float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+	df(mdl, depart, -sqrtf(2*obj_gain)*tmp);
+};

@@ -48,9 +48,15 @@ Mdl_t * cree_mdl(
 	uint * _ema);
 void liberer_mdl(Mdl_t * mdl);
 
+void plume_mdl(Mdl_t * mdl);
+
 //	F(x) & F'(x)
 float f(Mdl_t * mdl, uint depart);
 void df(Mdl_t * mdl, uint depart, float erreur);
+
+//	Fonction Objectif
+float objectif_gain(Mdl_t * mdl, uint depart);
+void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain);
 
 //	Optimisation & Gain
 float score(Mdl_t * mdl);	//=somme(gains); w -= f'(x) * alpha; alpha = 1/moy(ddf(x))

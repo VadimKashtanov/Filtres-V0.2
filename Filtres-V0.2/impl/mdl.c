@@ -62,7 +62,7 @@ Mdl_t * cree_mdl(
 	mdl->vars = couche_y[0];
 	mdl->poids = 0;
 	mdl->constantes = couche_n[0]*couche_y[0];
-	mdl->locds = 6+couche_n[0]+couche_n[0]-1;
+	mdl->locds = couche_y[0]*(6+couche_n[0]+couche_n[0]-1);
 	//
 	//	===== Autres Couches ====
 	for (uint i=1; i < N; i++) {
@@ -78,7 +78,7 @@ Mdl_t * cree_mdl(
 			//
 			mdl->poids += couche_y[i] * (2*couche_n[i] + 1);
 			mdl->constantes += 0;
-			mdl->locds += 1;
+			mdl->locds += 1*couche_y[i];
 		} else {
 			// === Couches Filtriques ===
 			mdl->couche_filtre_depart[i] = cpyuint(couche_filtre_depart[i], couche_y[i]);
@@ -88,8 +88,8 @@ Mdl_t * cree_mdl(
 			mdl->locd_depart[i] = mdl->locds;
 			//
 			mdl->poids += 0;
-			mdl->constantes += couche_y[i]*couche_n[i];\
-			mdl->locds += 6+couche_n[i]+couche_n[i]-1;
+			mdl->constantes += couche_y[i]*couche_n[i];
+			mdl->locds += couche_y[i]*(6+couche_n[i]+couche_n[i]-1);
 		}
 		//
 		mdl->y_depart[i] = mdl->vars;
@@ -148,4 +148,29 @@ void liberer_mdl(Mdl_t * mdl) {
 	free(mdl->locd_depart);
 	//
 	free(mdl);
+};
+
+static char * noms[] = {"Filtre-Prix", "Filtres", "Neurone"};
+
+void plume_mdl(Mdl_t * mdl) {
+	printf("======== Mdl ==========\n");
+	uint C = mdl->couches;
+	for (uint i=0; i < C; i++) {
+		printf("%i| %s :\n", i, noms[mdl->couche_type[i]]);
+		for (uint j=0; j < mdl->couche_y[i]; j++) {
+			if (mdl->couche_type[i] == 2) {
+				printf("\ty[%i] : ", j);
+				for (uint k=0; k < mdl->couche_n[i]; k++) {
+					printf("%i, ", mdl->couche_neurone_conn[i][j][k]);
+				}
+				printf("\n");
+			} else if (mdl->couche_type[i] == 1) {
+				printf("\ty[%i] : depart = %i\n",
+					j, mdl->couche_filtre_depart[i][j]);
+			} else if (mdl->couche_type[i] == 0) {
+				printf("\ty[%i] : ema=%i intervalle=%i\n",
+					j, mdl->ema[j], mdl->intervalles[j]);
+			}
+		}
+	}
 };

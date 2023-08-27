@@ -13,8 +13,8 @@ fi
 #	Executer
 printf "[\033[95m***\033[0m] ========= Execution du programme =========\n"
 
-#valgrind --leak-check=yes --track-origins=yes ./prog
-time ./prog
+valgrind --leak-check=yes --track-origins=yes ./prog
+#time ./prog
 if [ $? -ne 0 ]
 then
 	printf "[***] Erreur durant l'execution.\n"
