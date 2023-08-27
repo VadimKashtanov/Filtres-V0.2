@@ -174,10 +174,64 @@ void ecrire_mdl(Mdl_t * mdl, char * fichier) {
 	//
 	fwrite(mdl->constante, sizeof(float), mdl->constantes, fp);
 	fwrite(mdl->poid, sizeof(float), mdl->poids, fp);
+	//
+	fclose(fp);
 };
 
 Mdl_t * lire_mdl(char * fichier) {
-
+	FILE * fp = fopen(fichier, "rb");
+	//
+	uint C;
+	fread(&C, sizeof(uint), 1, fp);
+	//
+	uint couche_y[C], couche_n[C], couche_type[C];
+	fread(couche_type, sizeof(uint), C, fp);
+	fread(couche_y, sizeof(uint), C, fp);
+	fread(couche_n, sizeof(uint), C, fp);
+	//
+	uint intervalles[C], ema[C];
+	fread(intervalles, sizeof(uint), couche_y[0], fp);
+	fread(ema, sizeof(uint), couche_y[0], fp);
+	//
+	uint ** couche_neurone_conn[C];
+	uint * couche_filtre_depart[C];
+	for (uint i=1; i < C; i++) {
+		if (couche_type[i] == 2) {
+			couche_neurone_conn[i] = malloc(sizeof(uint*) * couche_y[i]);
+			for (uint j=0; j < couche_y[i]; j++) {
+				couche_neurone_conn[i][j] = malloc(sizeof(uint) * couche_n[i]);
+				fread(couche_neurone_conn[i][j], sizeof(uint), couche_n[i], fp);
+			}
+		} else {
+			couche_filtre_depart[i] = malloc(sizeof(uint) * couche_n[i]);
+			fread(couche_filtre_depart[i], sizeof(uint), couche_n[i], fp);
+		}
+	}
+	//
+	Mdl_t * mdl = cree_mdl(
+		C,
+		couche_type, couche_n, couche_y,
+		couche_neurone_conn,	//[i] = 0 si i-eme est non neuronal
+		couche_filtre_depart,	//[i] = 0 si ieme est non filtrique
+		intervalles,
+		ema);
+	//
+	fread(mdl->constante, sizeof(float), mdl->constantes, fp);
+	fread(mdl->poid, sizeof(float), mdl->poids, fp);
+	//
+	fclose(fp);
+	//
+	for (uint i=1; i < C; i++) {
+		if (mdl->couche_type[i] == 2) {
+			for (uint j=0; j < mdl->couche_y[i]; j++)
+				free(couche_neurone_conn[i][j]);
+			free(couche_neurone_conn[i]);
+		} else {
+			free(couche_filtre_depart[i]);
+		}
+	}
+	//
+	return mdl;
 };
 
 static char * noms[] = {"Filtre-Prix", "Filtres", "Neurone"};
