@@ -150,13 +150,43 @@ void liberer_mdl(Mdl_t * mdl) {
 	free(mdl);
 };
 
+void ecrire_mdl(Mdl_t * mdl, char * fichier) {
+	FILE * fp = fopen(fichier, "wb");
+	fwrite(&mdl->N, sizeof(uint), 1, fp);
+	uint C = mdl->N;
+	//
+	fwrite(mdl->couche_type, sizeof(uint), C, fp);
+	fwrite(mdl->couche_y, sizeof(uint), C, fp);
+	fwrite(mdl->couche_n, sizeof(uint), C, fp);
+	//
+	fwrite(mdl->intervalles, sizeof(uint), mdl->couche_y[0], fp);
+	fwrite(mdl->ema, sizeof(uint), mdl->couche_y[0], fp);
+	//
+	for (uint i=1; i < C; i++) {
+		if (mdl->couche_type[i] == 2) {
+			for (uint j=0; j < mdl->couche_y[i]; j++) {
+				fwrite(mdl->couche_neurone_conn[i][j], sizeof(uint), mdl->couche_n[i], fp);
+			}
+		} else {
+			fwrite(mdl->couche_filtre_depart[i], sizeof(uint), mdl->couche_n[i], fp);
+		}
+	}
+	//
+	fwrite(mdl->constante, sizeof(float), mdl->constantes, fp);
+	fwrite(mdl->poid, sizeof(float), mdl->poids, fp);
+};
+
+Mdl_t * lire_mdl(char * fichier) {
+
+};
+
 static char * noms[] = {"Filtre-Prix", "Filtres", "Neurone"};
 
 void plume_mdl(Mdl_t * mdl) {
 	printf("======== Mdl ==========\n");
 	uint C = mdl->couches;
 	for (uint i=0; i < C; i++) {
-		printf("%i| %s :\n", i, noms[mdl->couche_type[i]]);
+		printf("%i| %s n=%i:\n", i, noms[mdl->couche_type[i]], mdl->couche_n[i]);
 		for (uint j=0; j < mdl->couche_y[i]; j++) {
 			if (mdl->couche_type[i] == 2) {
 				printf("\ty[%i] : ", j);

@@ -48,6 +48,11 @@ Mdl_t * cree_mdl(
 	uint * _ema);
 void liberer_mdl(Mdl_t * mdl);
 
+//	Disque Dur
+void ecrire_mdl(Mdl_t * mdl, char * fichier);
+Mdl_t * lire_mdl(char * fichier);
+
+//	Etc
 void plume_mdl(Mdl_t * mdl);
 
 //	F(x) & F'(x)
