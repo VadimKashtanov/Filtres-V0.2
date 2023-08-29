@@ -19,8 +19,8 @@ inline float ___exp(register float x)  // cubic spline approximation
 inline float ___gauss(register float x) {return ___exp(-x*x);};
 inline float ___d_gauss(register float x) {return -2*x*___gauss(x);};
 
-inline float ___logistique(register float x) {return 2*___tanh(x)+0.5;};    //  2*(tanh(x))+0.5
-inline float ___d_logistique(register float x) {return ___logistique(x)*(1 - ___logistique(x));};
+//inline float ___logistique(register float x) {return 2*___tanh(x)+0.5;};    //  2*(tanh(x))+0.5
+//inline float ___d_logistique(register float x) {return ___logistique(x)*(1 - ___logistique(x));};
 
 inline float ___tanh(register float x) {return tanh(x);};//x/(0.5 + fabs(x));};		//  x/( 0.5 + fabs(x) )
 inline float ___d_tanh(register float x) {return 1 - powf(___tanh(x), 2);};
@@ -49,3 +49,22 @@ void gnuplot(float * arr, uint len, char * titre) {
 	//
 	assert(!system("rm gnuplot_dat.dat"));
 };
+
+uint* cpyuint(uint * arr, uint len) {
+	uint * ret = malloc(sizeof(uint) * len);
+	memcpy(ret, arr, sizeof(uint) * len);
+	return ret;
+}
+
+float* allouer_flotants(uint nb) {
+	return malloc(sizeof(float) * nb);
+}
+
+uint u_max(uint * x, uint len) {
+	uint _max=x[0];
+	FOR(1,i,len) {
+		if (x[i] > _max)
+			_max = x[i];
+	};
+	return _max;
+}

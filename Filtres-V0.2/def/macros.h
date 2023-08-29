@@ -14,6 +14,12 @@
 //
 #include <x86intrin.h>
 
+//	===== Clarete de Code =====
+#define FOR(d,i,N) for (uint i=d; i < N; i++)
+#define ptr printf
+#define RETRO_FOR(i,N,d) for (int i=N-1; i >= d; i--)
+
+//	===== Eternels Arguments variadiques =====
 #define OK(str, ...) printf("[\033[35;1m*\033[0m]:\033[96m%s:(%d)\033[32m: " str "\033[0m\n", __FILE__, __LINE__, ##__VA_ARGS__);
 #define MSG(str, ...) printf("\033[35;1m -> \033[0m \033[96m%s:(%d)\033[35m: " str "\033[0m\n", __FILE__, __LINE__, ##__VA_ARGS__);
 #define ERR(str, ...) do {printf("[\033[30;101mError\033[0m]:\033[96m%s:(%d)\033[30m: " str "\033[0m\n", __FILE__, __LINE__, ##__VA_ARGS__);raise(SIGINT);} while (0);

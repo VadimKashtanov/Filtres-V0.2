@@ -19,3 +19,9 @@ float ___d_tanh(register float x);
 //  ========= Utilitaire =============
 
 void gnuplot(float * arr, uint len, char * titre);
+
+uint* cpyuint(uint * arr, uint len);
+float* allouer_flotants(uint nb);
+
+//	==== Maximum =====
+uint u_max(uint * x, uint len);

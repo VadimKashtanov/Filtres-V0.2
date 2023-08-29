@@ -7,16 +7,24 @@
 //	1|	n-filtre
 //	2|	n-neurone
 
+#define POIDS_NEU(n) (2*n+1)
+#define CONSTS_FLTR(n) (n)
+
+#define LOCDS_NEU(n) (1+n)
+#define LOCDS_FLTR(n) (6+n+(n-1))
+
 typedef struct {
 	//	Structure du systeme
-	uint couches, N;
-	uint * couche_type;	// dans {0,1,2}, la 0-eme etant toujours de 0
-	uint * couche_n;	//	combien d'entrees prend chaque y
-	uint * couche_y;	//	combien de sorties
+	uint couches, N, C;
+	uint * type;	// dans {0,1,2}, la 0-eme etant toujours de 0
+	uint * y;	//	combien de sorties
+	uint * n;	//	combien d'entrees prend chaque y
+
+	uint max_n;
 
 	//	Couches neuronalles
-	uint *** couche_neurone_conn;	//[couche][neurone][connection] pris dans {0..y[-1]}
-	uint ** couche_filtre_depart;	//[couche][filtre] pris dans {0..(y[-1] - n)}
+	uint *** neu_vers;	//[couche][neurone][connection] pris dans {0..y[-1]}
+	uint ** fltr_depart;	//[couche][filtre] pris dans {0..(y[-1] - n)}
 
 	//	Pour la 0-eme couche
 	uint * intervalles;	// dans intervalles[INTERVALLES] (voir marchee.h)
@@ -40,9 +48,9 @@ typedef struct {
 //	Allocation Memoire
 Mdl_t * cree_mdl(
 	uint couches,
-	uint * couche_type, uint * couche_n, uint * couche_y,
-	uint *** couche_neurone_conn,	//[i] = 0 si i-eme est non neuronal
-	uint ** couche_filtre_depart,	//[i] = 0 si ieme est non filtrique
+	uint * couche_type, uint * n, uint * y,
+	uint *** neu_vers,	//[i] = 0 si i-eme est non neuronal
+	uint ** fltr_depart,	//[i] = 0 si ieme est non filtrique
 	// 0 -eme couche
 	uint * _intervalles,
 	uint * _ema);
