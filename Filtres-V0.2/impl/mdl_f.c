@@ -38,8 +38,8 @@ static float filtre_n(float * locd, float * arr, float * filtre, uint n) {
 		}
 	}
 
-	locd[0] = _max;
-	locd[1] = _min;
+	locd[0] = _min;
+	locd[1] = _max;
 	locd[2] = max_pos;
 	locd[3] = min_pos;
 
@@ -50,12 +50,12 @@ static float filtre_n(float * locd, float * arr, float * filtre, uint n) {
 	float _s = 0;
 	const float d = _max-_min;
 	float tmp, signe;
-	for (int i=0; i < n; i++) {
+	for (uint i=0; i < n; i++) {
 		x[i] = (arr[i]-_min)/d;
 		//
 		//
 		tmp = x[i] - filtre[i];
-		signe = fabs(tmp)/tmp;
+		signe = (tmp >= 0 ? 1 : -1);
 		tmp = sqrtf(1.0f+fabs(tmp));
 		//
 		_s += tmp;
@@ -67,7 +67,7 @@ static float filtre_n(float * locd, float * arr, float * filtre, uint n) {
 	float _d = 0.0;
 	for (int i=0; i < n-1; i++) {
 		tmp = (x[i+1]-x[i]) - (filtre[i+1]-filtre[i]);
-		signe = fabs(tmp)/tmp;
+		signe = (tmp >= 0 ? 1 : -1); //fabs(tmp)/tmp;
 		tmp = 1.0f + fabs(tmp);
 		//
 		_d += powf(tmp,2);
@@ -115,17 +115,18 @@ static void df_filtre_n(
 	//
 	float _dmax=0, _dmin=0;
 	for (uint i=0; i < n; i++) {
-		grad[i] = dx[i]/d;
-		//printf("%f\n", dx[i]);
-		_dmax += (arr[i]-_min)/(d*d)*dx[i];
-		_dmin += -dx[i]/d;
+		//printf(">> %f %f\n", dx[i], d);
+		grad[i] += dx[i]/d; 							//printf("%f\n", dx[i]/d);
+		grad[_maxpos] -= dx[i] * (arr[i]-_min)/(d*d);	//printf("%f\n", dx[i] * (arr[i]-_min)/(d*d));
+		grad[_minpos] -= dx[i] / d;						//printf("%f\n", dx[i] / d);
+		grad[_minpos] += dx[i] * (arr[i]-_min)/(d*d);	//printf("%f\n", dx[i] * (arr[i]-_min)/(d*d));
+		//printf("====%f %i %i\n", grad[i], _minpos, _maxpos);
 	}
 	//
 	//printf("%i %i\n", _maxpos, _minpos);
-	grad[_maxpos] += _dmax;
-	grad[_minpos] += _dmin;
+	//grad[_maxpos] += _dmax;
+	//grad[_minpos] += _dmin;
 };
-
 //	=======================================
 
 static float neurone_n(float * locd, float * arr, float * poid, uint n) {
@@ -155,7 +156,6 @@ static void d_neurone_n(
 		grad[i] = tmp * poid[i*2];
 		d_poid[i*2] = tmp * arr[i];
 		d_poid[i*2+1] = tmp;
-		//raise(SIGINT);
 	}
 };
 
@@ -284,5 +284,74 @@ float objectif_gain(Mdl_t * mdl, uint depart) {
 
 void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain) {
 	float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
-	df(mdl, depart, sqrtf(2*obj_gain)*tmp);
+	df(mdl, depart, -sqrtf(2*obj_gain)*tmp);
+};
+
+//============================================
+static float f_depuis(Mdl_t * mdl, uint depart, uint inst) {
+	uint C = mdl->N;
+	uint * type = mdl->type;
+	uint * y = mdl->y;
+	uint * n = mdl->n;
+
+	//	Filtres N
+	float * _x = allouer_flotants(mdl->max_n);
+	FOR(inst, i, C) {
+		FOR(0, j, y[i]) {
+			if (type[i] == 1) {
+				mdl->var[mdl->y_depart[i] + j] = filtre_n(
+					mdl->locd + mdl->locd_depart[i] + j*LOCDS_FLTR(mdl->n[i]),
+					//
+					mdl->var + mdl->y_depart[i-1] + mdl->fltr_depart[i][j],
+					mdl->constante + mdl->conste_depart[i] + mdl->n[i]*j,
+					mdl->n[i]
+				);
+			} else if (mdl->type[i] == 2) {
+				FOR(0, k, n[i]) {
+					_x[k] = mdl->var[mdl->y_depart[i-1] + mdl->neu_vers[i][j][k]];
+				}
+				//
+				mdl->var[mdl->y_depart[i] + j] = neurone_n(
+					mdl->locd + mdl->locd_depart[i] + j*LOCDS_NEU(mdl->n[i]),
+					_x, mdl->poid + mdl->poid_depart[i] + j*(2*mdl->n[i]+1),
+					mdl->n[i]
+				);
+			} else {
+				ERR("Pas de couche %i", mdl->type[i]);
+			}
+			//
+			mdl->d_var[mdl->y_depart[i] + j] = 0.0;	//pour pas faire 2 boucles
+		}
+	}
+	free(_x);
+	//
+	return mdl->var[mdl->vars-1];
+};
+
+float depuis_objectif_gain(Mdl_t * mdl, uint depart, uint c) {
+	float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+	return powf(f_depuis(mdl, depart, c)*tmp-fabs(tmp), 2)/2;
+};
+
+void comparer_grads(Mdl_t * mdl) {
+	float _f = objectif_gain(mdl, DEPART);
+
+	float _grad[mdl->vars];
+	for (uint i=0; i < mdl->vars; i++) _grad[i] = 0;
+	//
+	const float _1E5 = 1e-3;
+	//
+	for (uint c=0; c < mdl->N; c++) {
+		for (uint i=0; i < mdl->y[c]; i++) {
+			mdl->var[mdl->y_depart[c] + i] += _1E5;
+			_grad[mdl->y_depart[c] + i] = (depuis_objectif_gain(mdl, DEPART, c+1) - _f)/_1E5;
+			mdl->var[mdl->y_depart[c] + i] -= _1E5;
+		}
+	}
+
+	d_objectif_gain(mdl, DEPART, objectif_gain(mdl, DEPART));
+
+	for (uint i=0; i < mdl->vars; i++) {
+		printf("%i| %f -- %f\n", i, _grad[i], mdl->d_var[i]);
+	};
 };

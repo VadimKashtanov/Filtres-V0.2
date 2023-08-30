@@ -73,3 +73,7 @@ void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain);
 
 //	Optimisation & Gain
 float score(Mdl_t * mdl);	//=somme(gains); w -= f'(x) * alpha; alpha = 1/moy(ddf(x))
+
+
+
+void comparer_grads(Mdl_t * mdl);

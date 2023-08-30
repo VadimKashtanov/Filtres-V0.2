@@ -116,19 +116,20 @@ void verifier_derivee(Mdl_t * mdl) {
 #define FLTR 1
 
 int main() {
-	srand(32);
+	srand(0);
 	charger_les_prixs();
 
 	//
 	uint couche_type[] = {  0,  NEU, FLTR };
-	uint y[] =    		 {  5,    4,   1  };
-	uint n[] =    		 {  4,    2,   4  };
+	uint y[] =    		 {  2,    3,   1  };
+	uint n[] =    		 {  4,    2,   3  };
 	//
 	Mdl_t * mdl = generer(3, couche_type, y, n);
 	//
+	//comparer_grads(mdl);
 	verifier_derivee(mdl);
-	d_objectif_gain(mdl, DEPART, objectif_gain(mdl, DEPART));
-	plume_mdl(mdl);
+	//d_objectif_gain(mdl, DEPART, objectif_gain(mdl, DEPART));
+	//plume_mdl(mdl);
 	
 	//
 	liberer_mdl(mdl);
