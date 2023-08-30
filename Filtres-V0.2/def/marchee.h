@@ -3,7 +3,7 @@
 #include "etc.h"
 
 #define USDT 100.0
-#define LEVIER 20.0
+#define LEVIER 50.0
 
 #define PRIXS 100000 		//100.000 * NB_DIFF_EMA * 32-flotant = NB_DIFF_EMA/10 * 1Mo = 0.1Mo * NB_DIFF_EMA
 #define MAX_GAIN 2001520.0

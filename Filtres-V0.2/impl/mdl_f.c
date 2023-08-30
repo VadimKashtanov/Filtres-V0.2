@@ -276,30 +276,3 @@ void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain) {
 	float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
 	df(mdl, depart, -sqrtf(2*obj_gain)*tmp);
 };
-
-void verifier_derivee(Mdl_t * mdl) {
-	float _d_poid[mdl->poids];
-	float _f = objectif_gain(mdl, DEPART);
-	const float _1E5 = 1e-3;
-
-	FOR(0, i, mdl->poids) {
-		mdl->poid[i] += _1E5;
-		_d_poid[i] = (objectif_gain(mdl, DEPART)-_f)/_1E5;
-		mdl->poid[i] -= _1E5;
-		mdl->d_poid[i] = 0;
-	};
-
-	d_objectif_gain(mdl, DEPART, objectif_gain(mdl, DEPART));
-	
-	FOR(0, i, mdl->poids) {
-		float a = _d_poid[i];
-		float b = mdl->d_poid[i];
-		
-		if (fabs(a+b)/2*.01 > fabs(a-b) || fabs(a-b) < 0.001) {
-			printf("\033[42m%i|  %f  --  %f\033[0m\n", i, _d_poid[i], mdl->d_poid[i]);
-		} else {
-			printf("\033[41m%i|  %f  --  %f   [x%f]\033[0m\n",
-				i, _d_poid[i], mdl->d_poid[i], _d_poid[i]/mdl->d_poid[i]);
-		}
-	};
-};
