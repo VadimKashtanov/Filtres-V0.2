@@ -164,8 +164,10 @@ void ecrire_mdl(Mdl_t * mdl, char * fichier) {
 			FOR(0, j, mdl->y[i]) {
 				fwrite(mdl->neu_vers[i][j], sizeof(uint), mdl->n[i], fp);
 			}
+		} else if (mdl->type[i] == 1) {
+			fwrite(mdl->fltr_depart[i], sizeof(uint), mdl->y[i], fp);
 		} else {
-			fwrite(mdl->fltr_depart[i], sizeof(uint), mdl->n[i], fp);
+			ERR("couches %i n'existe pas", mdl->type[i]);
 		}
 	}
 	//
@@ -203,8 +205,8 @@ Mdl_t * lire_mdl(char * fichier) {
 			}
 
 		} else {
-			fltr_depart[i] = malloc(sizeof(uint) * n[i]);
-			fread(fltr_depart[i], sizeof(uint), n[i], fp);
+			fltr_depart[i] = malloc(sizeof(uint) * y[i]);
+			fread(fltr_depart[i], sizeof(uint), y[i], fp);
 		}
 	}
 	//
@@ -291,11 +293,11 @@ void plume_mdl(Mdl_t * mdl) {
 		}
 	}
 
-	ptr(" === grad ===\n");
+	/*ptr(" === grad ===\n");
 	for (uint i=mdl->y_depart[1]; i < mdl->vars; i++)
 		ptr("%i| %f\n", i, mdl->d_var[i]);
 
 	ptr(" === var ===\n");
 	for (uint i=0; i < mdl->vars; i++)
-		ptr("%i| %f\n", i, mdl->var[i]);
+		ptr("%i| %f\n", i, mdl->var[i]);*/
 };

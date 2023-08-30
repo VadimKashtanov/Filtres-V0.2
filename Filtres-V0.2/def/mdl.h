@@ -56,6 +56,8 @@ Mdl_t * cree_mdl(
 	uint * _ema);
 void liberer_mdl(Mdl_t * mdl);
 
+void verifier_derivee(Mdl_t * mdl);
+
 //	Disque Dur
 void ecrire_mdl(Mdl_t * mdl, char * fichier);
 Mdl_t * lire_mdl(char * fichier);
@@ -72,8 +74,5 @@ float objectif_gain(Mdl_t * mdl, uint depart);
 void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain);
 
 //	Optimisation & Gain
-float score(Mdl_t * mdl);	//=somme(gains); w -= f'(x) * alpha; alpha = 1/moy(ddf(x))
-
-
-
-void comparer_grads(Mdl_t * mdl);
+float score(Mdl_t * mdl);
+//=somme(gains); w -= f'(x) * alpha; alpha = 1/moy(ddf(x))
