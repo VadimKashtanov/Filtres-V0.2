@@ -42,7 +42,9 @@
 
 //	===== Plumation de courbes =====
 
-#define UNE_COURBE(nom) float * nom=malloc(sizeof(float)*2); uint nom##taille_reele=2; uint utilisee##_l=0;
-#define EXPANDRE_LA_COURBE(nom, taille_r, util) 
-#define SUIVIE_COURBE(nom, val) do {if (utilisee##_l < nom##taille_reele) {nom[utilisee##_l++] = val} else {nom##taille_reele*=2; } } while(0);
-#define PLUMER_LA_COURBE(nom)
+#define UNE_COURBE(nom) float * nom=malloc(sizeof(float)*2); uint nom##taille_reele=2; uint nom##_l=0;
+#define EXPANDRE_LA_COURBE(nom) do { nom##taille_reele*=2; nom = realloc(nom, sizeof(float)*nom##taille_reele); } while(0);
+#define ASSIGNER_VALEUR(nom, val) do {nom[nom##_l++] = val; } while(0);
+#define SUIVIE_COURBE(nom, val) do {if (nom##_l < nom##taille_reele) {ASSIGNER_VALEUR(nom, val)} else {EXPANDRE_LA_COURBE(nom); ASSIGNER_VALEUR(nom, val);} } while(0);
+#define PLUMER_LA_COURBE(nom) gnuplot(nom, nom##_l, " Courbe de "#nom);
+#define LIBERER_LA_COURBE(nom) free(nom);

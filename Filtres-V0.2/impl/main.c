@@ -156,7 +156,7 @@ int main() {
 	srand(2);
 	charger_les_prixs();
 
-	MODE_OBJECTIF = 1;
+	MODE_OBJECTIF = 0;
 
 #define N 3
 
@@ -174,8 +174,8 @@ int main() {
 		//0,
 		//0.1,
 		//0.00001,
-		10.1,
-		0.00000001
+		1.0,
+		0.1
 	};
 	
 	Mdl_t * mdl = gen(pile, N);

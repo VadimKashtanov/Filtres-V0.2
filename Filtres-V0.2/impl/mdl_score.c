@@ -48,7 +48,7 @@ float estimer_alpha(Mdl_t * mdl, uint depart, uint N) {
 	return alpha;
 };
 
-#define OPTI_TOUT_LES 1000
+#define OPTI_TOUT_LES 50
 #define ALPHA_TOUT_LES 100000000000
 
 float score(Mdl_t * mdl, float * les_alpha) {
@@ -64,13 +64,12 @@ float score(Mdl_t * mdl, float * les_alpha) {
 	float p1, p0;
 	memset(mdl->d_poid, 0, sizeof(float) * mdl->poids);
 
-
-	float * suivie = allouer_flotants((PRIXS-DEPART)/100);
-
+UNE_COURBE(suivie_gains);
 UNE_COURBE(dp0);
+UNE_COURBE(p11);
 
 	//
-	for (uint i=DEPART; i < PRIXS-1; i++) {
+	for (uint i=DEPART; i < 6150/*PRIXS-1*/; i++) {
 		p1 = prixs[i+1];
 		p0 = prixs[i];
 		//
@@ -79,7 +78,8 @@ UNE_COURBE(dp0);
 		//
 		_gain = mdl->var[mdl->vars - 1] * (p1/p0 - 1) * LEVIER;
 		gain_total += _gain;
-		if ((i-DEPART)%100==0) suivie[(i-DEPART)/100] = gain_total;
+		//
+		if ((i-DEPART)%100==0) SUIVIE_COURBE(suivie_gains, gain_total);
 		//
 
 		if (i % ALPHA_TOUT_LES == 0) {
@@ -87,22 +87,32 @@ UNE_COURBE(dp0);
 			//
 			//printf("%i/%i\n", i, PRIXS);
 		};
+		SUIVIE_COURBE(p11, mdl->poid[11]);
 
 		d_objectif_gain(mdl, i, _score);
 		if (i % OPTI_TOUT_LES == 0) {
+			//
+			SUIVIE_COURBE(dp0, mdl->d_poid[11]);
+			//
 			for (uint p=0; p < mdl->poids; p++) {
 				//printf("%f\n", mdl->d_poid[p]);
 				//if (mdl->d_poid[p] != 0) mdl->poid[p] += _score/mdl->d_poid[p];
 				mdl->poid[p] -= /*alpha*/ les_alpha[p]*mdl->d_poid[p] / (float)OPTI_TOUT_LES;// / (1+p*10);
-				SUIVIE_COURBE(dp0, mdl->d_poid[0]);
+				printf("%f\n", les_alpha[p]*mdl->d_poid[p] / (float)OPTI_TOUT_LES);
 				mdl->d_poid[p] = 0;
 			}
 			//printf("=============================\n");
 		}
 	}
 	PLUMER_LA_COURBE(dp0);
+	LIBERER_LA_COURBE(dp0);
 	//
-	//gnuplot(suivie, (PRIXS-DEPART)/100, "suivie des gains");
+	PLUMER_LA_COURBE(p11);
+	LIBERER_LA_COURBE(p11);
+	//
+	//PLUMER_LA_COURBE(suivie_gain);
+	//LIBERER_LA_COURBE(suivie_gain);
+	//
 	printf("Gain total = %f\n", gain_total);
 	//
 	return score / (PRIXS-DEPART);	//Score Moyen pour que je vois. Si besoin du vrai gain, utiliser printf()
