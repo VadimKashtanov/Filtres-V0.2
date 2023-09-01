@@ -153,29 +153,29 @@ static float * filtre_alpha_mdl(Mdl_t * mdl, float * les_alpha) {
 };
 
 int main() {
-	srand(5);
+	srand(2);
 	charger_les_prixs();
 
-	MODE_OBJECTIF = 0;
+	MODE_OBJECTIF = 1;
 
-#define N 6
+#define N 3
 
 	A_t pile[N] = {
-		{.c=0,    .y=64, .n=6},
-		{.c=FLTR, .y=32, .n=4},
+		{.c=0,    .y=3, .n=6},
+		//{.c=FLTR, .y=32, .n=4},
 		//
-		{.c=NEU,  .y=16, .n=6},
-		{.c=NEU,  .y=8, .n=4},
-		{.c=NEU,  .y=4, .n=4},
-		{.c=NEU,  .y=1, .n=4}
+		//{.c=NEU,  .y=16, .n=6},
+		//{.c=NEU,  .y=8, .n=4},
+		{.c=NEU,  .y=2, .n=2},
+		{.c=NEU,  .y=1, .n=2}
 	};
 	float les_alpha[] = {
 		0,
-		0,
-		0.1,
-		0.05,
-		0.01,
-		0.001
+		//0,
+		//0.1,
+		//0.00001,
+		10.1,
+		0.00000001
 	};
 	
 	Mdl_t * mdl = gen(pile, N);
@@ -183,8 +183,8 @@ int main() {
 
 	//verifier_derivee(mdl);
 
-	//zero_dpoid(mdl);
-	//derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
+	zero_dpoid(mdl);
+	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
 	//zero_dpoid(mdl);
 	//derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
 
@@ -196,12 +196,19 @@ int main() {
 		//FOR(0, p, mdl->poids) mdl->poid[p] = 2*rnd()-1;
 		//score(mdl, les_alpha);
 	//}
-	score(mdl, les_alpha);
+	srand(0);
+	comportement(mdl);
+	printf("##################################\n");
+
+	score(mdl, filtre_alpha);
 	//score(mdl, les_alpha);
 	//score(mdl, les_alpha);
 
-	//srand(0);
-	//comportement(mdl);
+	zero_dpoid(mdl);
+	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
+
+	srand(0);
+	comportement(mdl);
 	//derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
 
 	/*//printf("%f\n", estimer_alpha(mdl, DEPART, 5));

@@ -39,3 +39,10 @@
 #define INIT_CHRONO() time_t chrono;
 #define DEPART_CHRONOS() chrono = clock();
 #define VALEUR_CHRONO() (((float)(clock()-chrono))/CLOCKS_PER_SEC)
+
+//	===== Plumation de courbes =====
+
+#define UNE_COURBE(nom) float * nom=malloc(sizeof(float)*2); uint nom##taille_reele=2; uint utilisee##_l=0;
+#define EXPANDRE_LA_COURBE(nom, taille_r, util) 
+#define SUIVIE_COURBE(nom, val) do {if (utilisee##_l < nom##taille_reele) {nom[utilisee##_l++] = val} else {nom##taille_reele*=2; } } while(0);
+#define PLUMER_LA_COURBE(nom)

@@ -2,6 +2,62 @@
 
 static char * noms[] = {"Filtre-Prix", "Filtres", "Neurone"};
 
+static void plume_poids(Mdl_t * mdl) {
+	ptr(" === poids ===\n");
+	FOR(0, i, mdl->C) {
+		ptr("%s #%i\n", noms[mdl->type[i]], i);
+		if (mdl->type[i] == 2) {
+			uint poids = POIDS_NEU(mdl->n[i]);
+			FOR(0, j, mdl->y[i]) {
+				ptr(" .y%i:\n", j);
+				FOR(0, k, poids) {
+					ptr("%i| %f\n",
+					mdl->poid_depart[i] + j*poids + k,
+					mdl->poid[mdl->poid_depart[i] + j*poids + k]);
+				}
+			}
+		}
+	}
+};
+
+static void plume_constes(Mdl_t * mdl) {
+	ptr(" === constantes ===\n");
+	FOR(0, i, mdl->C) {
+		ptr("%s #%i\n", noms[mdl->type[i]], i);
+		if (mdl->type[i] < 2) {
+			uint constantes = CONSTS_FLTR(mdl->n[i]);
+			FOR(0, j, mdl->y[i]) {
+				ptr(" .y%i:\n", j);
+				FOR(0, k, constantes) {
+					ptr("%i| %f\n",
+					mdl->conste_depart[i] + j*constantes + k,
+					mdl->constante[mdl->conste_depart[i] + j*constantes + k]);
+				}
+			}
+		}
+	}
+};
+
+static void plume_var(Mdl_t * mdl) {
+	ptr(" === vars ===\n");
+	FOR(0, i, mdl->C) {
+		ptr("#%i %s\n", i, noms[i]);
+		FOR(0, j, mdl->y[i]) {
+			ptr("%i| %f \n", mdl->y_depart[i] + j, mdl->var[mdl->y_depart[i] + j]);
+		}
+	}
+};
+
+static void plume_grad(Mdl_t * mdl) {
+	ptr(" === grad ===\n");
+	FOR(0, i, mdl->C) {
+		ptr("#%i %s\n", i, noms[i]);
+		FOR(0, j, mdl->y[i]) {
+			ptr("%i| %f \n", mdl->y_depart[i] + j, mdl->d_var[mdl->y_depart[i] + j]);
+		}
+	}
+};
+
 void plume_mdl(Mdl_t * mdl) {
 	printf("======== Mdl ==========\n");
 	uint C = mdl->couches;
@@ -24,45 +80,10 @@ void plume_mdl(Mdl_t * mdl) {
 		}
 	};
 
-	ptr(" === poids ===\n");
-	FOR(0, i, mdl->C) {
-		ptr("%s #%i\n", noms[mdl->type[i]], i);
-		if (mdl->type[i] == 2) {
-			uint poids = POIDS_NEU(mdl->n[i]);
-			FOR(0, j, mdl->y[i]) {
-				ptr(" .y%i:\n", j);
-				FOR(0, k, poids) {
-					ptr("%i| %f\n",
-					mdl->poid_depart[i] + j*poids + k,
-					mdl->poid[mdl->poid_depart[i] + j*poids + k]);
-				}
-			}
-		}
-	}
-
-	ptr(" === constantes ===\n");
-	FOR(0, i, mdl->C) {
-		ptr("%s #%i\n", noms[mdl->type[i]], i);
-		if (mdl->type[i] < 2) {
-			uint constantes = CONSTS_FLTR(mdl->n[i]);
-			FOR(0, j, mdl->y[i]) {
-				ptr(" .y%i:\n", j);
-				FOR(0, k, constantes) {
-					ptr("%i| %f\n",
-					mdl->conste_depart[i] + j*constantes + k,
-					mdl->constante[mdl->conste_depart[i] + j*constantes + k]);
-				}
-			}
-		}
-	}
-
-	/*ptr(" === grad ===\n");
-	for (uint i=mdl->y_depart[1]; i < mdl->vars; i++)
-		ptr("%i| %f\n", i, mdl->d_var[i]);
-
-	*/ptr(" === var ===\n");
-	for (uint i=0; i < mdl->vars; i++)
-		ptr("%i| %f\n", i, mdl->var[i]);
+	plume_poids(mdl);
+	plume_constes(mdl);
+	plume_var(mdl);
+	plume_grad(mdl);
 };
 
 void verifier_derivee(Mdl_t * mdl) {
@@ -97,7 +118,7 @@ void verifier_derivee(Mdl_t * mdl) {
 //	===============================================================================
 
 void comportement(Mdl_t * mdl) {
-#define T 30
+#define T 15
 
 	uint depart = DEPART + (rand() % (PRIXS-DEPART-T-1));
 
@@ -123,9 +144,11 @@ void comportement(Mdl_t * mdl) {
 	//gnuplot(ema[1] + depart + T - 6*6, 6, "ema2");
 
 	//gnuplot(prixs + depart, T, "Prixs");
-	gnuplot(f_arr, T, "Valeur de f (achat vente)");
+	//gnuplot(f_arr, T, "Valeur de f (achat vente)");
 
-	plume_mdl(mdl);
+	//plume_mdl(mdl);
+	plume_poids(mdl);
+	plume_constes(mdl);
 };
 
 //================================================================================

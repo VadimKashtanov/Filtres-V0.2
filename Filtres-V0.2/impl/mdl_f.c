@@ -283,7 +283,7 @@ float objectif_gain(Mdl_t * mdl, uint depart) {
 		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
 		f(mdl, depart);
 		if (tmp*mdl->var[mdl->vars-1] >= 0) {
-			return powf(f(mdl, depart)*tmp-fabs(tmp), 2)/2;
+			return 0;//powf(f(mdl, depart)*tmp-fabs(tmp), 2)/2;
 		} else {
 			return powf(mdl->var[mdl->vars-1]*tmp - fabs(tmp), 6)/2;
 		}
@@ -302,7 +302,7 @@ void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain) {
 		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
 		//
 		if (tmp*mdl->var[mdl->vars-1] >= 0) {
-			df(mdl, depart, -sqrtf(2*obj_gain)*tmp);
+			df(mdl, depart, 0);//-sqrtf(2*obj_gain)*tmp);
 		} else {
 			df(mdl, depart, powf(mdl->var[mdl->vars-1]*tmp - fabs(tmp),5)*tmp*6/2);
 		}
