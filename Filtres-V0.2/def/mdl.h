@@ -7,7 +7,7 @@
 //	1|	n-filtre
 //	2|	n-neurone
 
-#define POIDS_NEU(n) (2*n/*+1*/)
+#define POIDS_NEU(n) (/*2**/n /*+1*/)
 #define CONSTS_FLTR(n) (n)
 
 #define LOCDS_NEU(n) (1+n)

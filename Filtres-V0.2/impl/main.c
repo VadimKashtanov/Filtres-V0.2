@@ -153,7 +153,7 @@ static float * filtre_alpha_mdl(Mdl_t * mdl, float * les_alpha) {
 };
 
 int main() {
-	srand(2);
+	srand(0);
 	charger_les_prixs();
 
 	MODE_OBJECTIF = 0;
@@ -174,14 +174,14 @@ int main() {
 		//0,
 		//0.1,
 		//0.00001,
-		1.0,
+		0.2,
 		0.1
 	};
 	
 	Mdl_t * mdl = gen(pile, N);
 	float * filtre_alpha = filtre_alpha_mdl(mdl, les_alpha);
 
-	//verifier_derivee(mdl);
+	verifier_derivee(mdl);
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
@@ -201,8 +201,8 @@ int main() {
 	printf("##################################\n");
 
 	score(mdl, filtre_alpha);
-	//score(mdl, les_alpha);
-	//score(mdl, les_alpha);
+	score(mdl, les_alpha);
+	score(mdl, les_alpha);
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));

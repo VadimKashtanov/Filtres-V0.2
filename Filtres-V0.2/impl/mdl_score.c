@@ -48,7 +48,7 @@ float estimer_alpha(Mdl_t * mdl, uint depart, uint N) {
 	return alpha;
 };
 
-#define OPTI_TOUT_LES 50
+#define OPTI_TOUT_LES 1000
 #define ALPHA_TOUT_LES 100000000000
 
 float score(Mdl_t * mdl, float * les_alpha) {
@@ -65,18 +65,17 @@ float score(Mdl_t * mdl, float * les_alpha) {
 	memset(mdl->d_poid, 0, sizeof(float) * mdl->poids);
 
 UNE_COURBE(suivie_gains);
-UNE_COURBE(dp0);
 UNE_COURBE(p11);
 
 	//
-	for (uint i=DEPART; i < 6150/*PRIXS-1*/; i++) {
+	for (uint i=DEPART; i < PRIXS-1; i++) {
 		p1 = prixs[i+1];
 		p0 = prixs[i];
 		//
 		_score = objectif_gain(mdl, i);
 		score += _score;
 		//
-		_gain = mdl->var[mdl->vars - 1] * (p1/p0 - 1) * LEVIER;
+		_gain = mdl->var[mdl->vars - 1] * (p1/p0 - 1) * LEVIER * USDT;
 		gain_total += _gain;
 		//
 		if ((i-DEPART)%100==0) SUIVIE_COURBE(suivie_gains, gain_total);
@@ -87,27 +86,23 @@ UNE_COURBE(p11);
 			//
 			//printf("%i/%i\n", i, PRIXS);
 		};
-		SUIVIE_COURBE(p11, mdl->poid[11]);
+		SUIVIE_COURBE(p11, mdl->poid[0]);
 
 		d_objectif_gain(mdl, i, _score);
 		if (i % OPTI_TOUT_LES == 0) {
-			//
-			SUIVIE_COURBE(dp0, mdl->d_poid[11]);
 			//
 			for (uint p=0; p < mdl->poids; p++) {
 				//printf("%f\n", mdl->d_poid[p]);
 				//if (mdl->d_poid[p] != 0) mdl->poid[p] += _score/mdl->d_poid[p];
 				mdl->poid[p] -= /*alpha*/ les_alpha[p]*mdl->d_poid[p] / (float)OPTI_TOUT_LES;// / (1+p*10);
-				printf("%f\n", les_alpha[p]*mdl->d_poid[p] / (float)OPTI_TOUT_LES);
+				//printf("%f\n", les_alpha[p]*mdl->d_poid[p] / (float)OPTI_TOUT_LES);
 				mdl->d_poid[p] = 0;
 			}
 			//printf("=============================\n");
 		}
 	}
-	PLUMER_LA_COURBE(dp0);
-	LIBERER_LA_COURBE(dp0);
 	//
-	PLUMER_LA_COURBE(p11);
+	//PLUMER_LA_COURBE(p11);
 	LIBERER_LA_COURBE(p11);
 	//
 	//PLUMER_LA_COURBE(suivie_gain);

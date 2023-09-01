@@ -120,12 +120,12 @@ static float neurone_n(float * locd, float * arr, float * poid, uint n) {
 	float _somme = 0.0;
 	float tmp;
 	for (uint i=0; i < n; i++) {
-		tmp = arr[i]*poid[i*2] + poid[i*2+1];
+		tmp = arr[i]*poid[i/**2*/];// + poid[i*2+1];
 		locd[i] = tmp;
 		_somme += (tmp);
 	}
 	locd[n] = _somme;
-	return ___tanh(4*_somme/n);// + poid[n*2]*M);	//ou gauss, a voire
+	return ___tanh(4*_somme/n/* + poid[n*2]*/);	//ou gauss, a voire
 };
 
 static void d_neurone_n(
@@ -134,15 +134,15 @@ static void d_neurone_n(
 	float * arr, float * poid, float * d_poid, uint n)
 {
 	float _somme = locd[n];
-	float _d_somme = 4*___d_tanh(4*_somme/n/* + poid[n*2]*M*/) * dy / n;
-	//d_poid[n*2] += _d_somme*n*M;
+	float _d_somme = 4*___d_tanh(4*_somme/n/* + poid[n*2]*/) * dy / n;
+	//d_poid[n/**2*/] += _d_somme*n/4;
 	//
 	float tmp;
 	for (uint i=0; i < n; i++) {
-		tmp = /*(locd[i]) * */_d_somme;
-		grad[i] = tmp * poid[i*2];
-		d_poid[i*2] += tmp * arr[i];
-		d_poid[i*2+1] += tmp;
+		tmp = /*___d_tanh*/(1+0*locd[i]) * _d_somme;
+		grad[i] = tmp * poid[i/**2*/];
+		d_poid[i/**2*/] += tmp * arr[i];
+		//d_poid[i*2+1] += tmp;
 	}
 };
 

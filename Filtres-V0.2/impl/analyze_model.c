@@ -143,8 +143,8 @@ void comportement(Mdl_t * mdl) {
 	//gnuplot(ema[1] + depart - 6*6, 6, "ema1");
 	//gnuplot(ema[1] + depart + T - 6*6, 6, "ema2");
 
-	//gnuplot(prixs + depart, T, "Prixs");
-	//gnuplot(f_arr, T, "Valeur de f (achat vente)");
+	gnuplot(prixs + depart, T, "Prixs");
+	gnuplot(f_arr, T, "Valeur de f (achat vente)");
 
 	//plume_mdl(mdl);
 	plume_poids(mdl);
