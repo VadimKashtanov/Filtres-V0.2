@@ -40,7 +40,7 @@ void plume_mdl(Mdl_t * mdl) {
 		}
 	}
 
-	/*ptr(" === constantes ===\n");
+	ptr(" === constantes ===\n");
 	FOR(0, i, mdl->C) {
 		ptr("%s #%i\n", noms[mdl->type[i]], i);
 		if (mdl->type[i] < 2) {
@@ -54,7 +54,7 @@ void plume_mdl(Mdl_t * mdl) {
 				}
 			}
 		}
-	}*/
+	}
 
 	/*ptr(" === grad ===\n");
 	for (uint i=mdl->y_depart[1]; i < mdl->vars; i++)
@@ -68,7 +68,7 @@ void plume_mdl(Mdl_t * mdl) {
 void verifier_derivee(Mdl_t * mdl) {
 	float _d_poid[mdl->poids];
 	float _f = objectif_gain(mdl, DEPART);
-	const float _1E5 = 1e-3;
+	const float _1E5 = 1e-4;
 
 	FOR(0, i, mdl->poids) {
 		mdl->poid[i] += _1E5;
@@ -97,16 +97,57 @@ void verifier_derivee(Mdl_t * mdl) {
 //	===============================================================================
 
 void comportement(Mdl_t * mdl) {
-	uint depart = DEPART + (rand() % (PRIXS-DEPART));
+#define T 30
 
-	float f_arr[30];
+	uint depart = DEPART + (rand() % (PRIXS-DEPART-T-1));
 
-	for (uint i=0; i < 30; i++) {
-		f_arr[i] = f(mdl, depart);
+	float f_arr[T];
+
+	float var_par_t[T*mdl->vars];
+
+	for (uint i=0; i < T; i++) {
+		f_arr[i] = f(mdl, depart + i);
+		memcpy(var_par_t + i*mdl->vars, mdl->var, sizeof(float)*mdl->vars);
 	};
 
-	gnuplot(prixs + depart, 30, "Prixs");
-	gnuplot(f_arr, 30, "Valeur de f (achat vente)");
+	for (uint i=0; i < mdl->vars; i++) {
+		printf("%i| ", i);
+		for (uint t=0; t < T; t++) {
+			if (var_par_t[t*mdl->vars + i] >= 0) printf(" ");
+			printf("%f | ", var_par_t[t*mdl->vars + i]);
+		}
+		printf("\n");
+	}
+
+	//gnuplot(ema[1] + depart - 6*6, 6, "ema1");
+	//gnuplot(ema[1] + depart + T - 6*6, 6, "ema2");
+
+	//gnuplot(prixs + depart, T, "Prixs");
+	gnuplot(f_arr, T, "Valeur de f (achat vente)");
 
 	plume_mdl(mdl);
+};
+
+//================================================================================
+
+#include "score.h"
+
+void derivee_et_seconde(Mdl_t * mdl, uint depart) {
+	printf(" === derivee et derivee second sur : depart=%i === \n", depart);
+	//
+	d_objectif_gain(mdl, depart, objectif_gain(mdl, depart));
+	//
+	for (uint c=0; c < mdl->couches; c++) {
+		printf("v -- %s -- v\n", noms[mdl->type[c]]);
+		if (mdl->type[c] == 2) {
+			for (uint j=0; j < POIDS_NEU(mdl->n[c])*mdl->y[c]; j++) {
+				uint i = mdl->poid_depart[c] + j;
+				printf("%3.i| dw = %s%f\n",//  dwidwi=%s%f\n",
+					i,
+					(mdl->d_poid[i] >= 0 ? " " : ""), mdl->d_poid[i]//,
+					//(dp2(mdl, DEPART, i, i) >= 0 ? " " : ""), dp2(mdl, DEPART, i, i)
+				);
+			}
+		}
+	};
 };

@@ -19,8 +19,8 @@ inline float ___exp(register float x)  // cubic spline approximation
 inline float ___gauss(register float x) {return ___exp(-x*x);};
 inline float ___d_gauss(register float x) {return -2*x*___gauss(x);};
 
-//inline float ___logistique(register float x) {return 2*___tanh(x)+0.5;};    //  2*(tanh(x))+0.5
-//inline float ___d_logistique(register float x) {return ___logistique(x)*(1 - ___logistique(x));};
+inline float ___logistique(register float x) {return 1.0/(1.0+___exp(-x));};//2*___tanh(x)+0.5;};    //  2*(tanh(x))+0.5
+inline float ___d_logistique(register float x) {return ___logistique(x)*(1 - ___logistique(x));};
 
 inline float ___tanh(register float x) {return tanhf(x);};//x/(0.5 + fabs(x));};		//  x/( 0.5 + fabs(x) )
 inline float ___d_tanh(register float x) {return 1 - powf(___tanh(x), 2);};

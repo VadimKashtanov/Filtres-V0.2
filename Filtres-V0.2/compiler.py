@@ -58,7 +58,7 @@ else:
 if not 'prog' in listdir():
 	a_compiler = sommes
 
-SDL_FLAGS = " -g " #"-O3" #" -mavx -g" #"-lSDL2 -lSDL2main -lSDL2_ttf `sdl2-config --cflags --libs`"
+SDL_FLAGS = " -g -O3" #"-O3" #" -mavx -g" #"-lSDL2 -lSDL2main -lSDL2_ttf `sdl2-config --cflags --libs`"
 
 print(f"[***] {len(a_compiler)}/{len(sommes)} fichiers a compiler")
 if len(a_compiler) == 0:

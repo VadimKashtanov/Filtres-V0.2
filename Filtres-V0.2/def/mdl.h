@@ -7,7 +7,7 @@
 //	1|	n-filtre
 //	2|	n-neurone
 
-#define POIDS_NEU(n) (2*n+1)
+#define POIDS_NEU(n) (2*n/*+1*/)
 #define CONSTS_FLTR(n) (n)
 
 #define LOCDS_NEU(n) (1+n)
@@ -60,10 +60,18 @@ void liberer_mdl(Mdl_t * mdl);
 void ecrire_mdl(Mdl_t * mdl, char * fichier);
 Mdl_t * lire_mdl(char * fichier);
 
+//	Controle
+void zero_dpoid(Mdl_t * mdl);
+
 //	F(x) & F'(x)
 float f(Mdl_t * mdl, uint depart);
 void df(Mdl_t * mdl, uint depart, float erreur);
 
 //	Fonction Objectif
+extern uint MODE_OBJECTIF;
 float objectif_gain(Mdl_t * mdl, uint depart);
 void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain);
+
+//	d2F(x)/dwidwj
+//	Le tableau se calcule dynamiquement avec (f(x+delta_x)-f(x)]/delta_x (1 poid a chaque fois)
+uint inverse(uint n, float * tableau, float * inverse); // !!! inverse doit etre == In

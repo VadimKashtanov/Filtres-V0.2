@@ -114,16 +114,18 @@ static void df_filtre_n(
 };
 //	=======================================
 
+static uint d=0;
+
 static float neurone_n(float * locd, float * arr, float * poid, uint n) {
 	float _somme = 0.0;
 	float tmp;
 	for (uint i=0; i < n; i++) {
 		tmp = arr[i]*poid[i*2] + poid[i*2+1];
 		locd[i] = tmp;
-		_somme += ___tanh(tmp);
+		_somme += (tmp);
 	}
 	locd[n] = _somme;
-	return ___tanh(_somme/n + poid[n*2]);	//ou gauss, a voire
+	return ___tanh(4*_somme/n);// + poid[n*2]*M);	//ou gauss, a voire
 };
 
 static void d_neurone_n(
@@ -132,15 +134,15 @@ static void d_neurone_n(
 	float * arr, float * poid, float * d_poid, uint n)
 {
 	float _somme = locd[n];
-	float _d_somme = ___d_tanh(_somme/n + poid[n*2]) * dy / n;
-	d_poid[n*2] = _d_somme*n;
+	float _d_somme = 4*___d_tanh(4*_somme/n/* + poid[n*2]*M*/) * dy / n;
+	//d_poid[n*2] += _d_somme*n*M;
 	//
 	float tmp;
 	for (uint i=0; i < n; i++) {
-		tmp = ___d_tanh(locd[i]) * _d_somme;
+		tmp = /*(locd[i]) * */_d_somme;
 		grad[i] = tmp * poid[i*2];
-		d_poid[i*2] = tmp * arr[i];
-		d_poid[i*2+1] = tmp;
+		d_poid[i*2] += tmp * arr[i];
+		d_poid[i*2+1] += tmp;
 	}
 };
 
@@ -170,6 +172,7 @@ float f(Mdl_t * mdl, uint depart) {
 
 		mdl->d_var[i] = 0.0;
 	};
+	//gnuplot(x, n[0], "");
 	
 	float * _x = allouer_flotants(mdl->max_n);
 	FOR(1, i, C) {
@@ -183,13 +186,15 @@ float f(Mdl_t * mdl, uint depart) {
 					mdl->n[i]
 				);
 			} else if (mdl->type[i] == 2) {
+				d = (C-i);
+				//
 				FOR(0, k, n[i]) {
 					_x[k] = mdl->var[mdl->y_depart[i-1] + mdl->neu_vers[i][j][k]];
 				}
 				//
 				mdl->var[mdl->y_depart[i] + j] = neurone_n(
 					mdl->locd + mdl->locd_depart[i] + j*LOCDS_NEU(mdl->n[i]),
-					_x, mdl->poid + mdl->poid_depart[i] + j*(2*mdl->n[i]+1),
+					_x, mdl->poid + mdl->poid_depart[i] + j*POIDS_NEU(mdl->n[i]),
 					mdl->n[i]
 				);
 			} else {
@@ -243,6 +248,7 @@ void df(Mdl_t * mdl, uint depart, float erreur) {
 				}
 
 			} else if (type[i] == 2) {
+				d = (C-1);
 				FOR(0, k, n[i]) {
 					_x[k] = mdl->var[mdl->y_depart[i-1] + mdl->neu_vers[i][j][k]];
 					_dx[k] = 0.0;
@@ -267,12 +273,40 @@ void df(Mdl_t * mdl, uint depart, float erreur) {
 	free(_dx);
 };
 
+uint MODE_OBJECTIF = 0;	//	{Objectif_gain_maximal, Reduction des Pertes}
+
 float objectif_gain(Mdl_t * mdl, uint depart) {
-	float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
-	return powf(f(mdl, depart)*tmp-fabs(tmp), 2)/2;
+	if (MODE_OBJECTIF == 0) {
+		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+		return powf(f(mdl, depart)*tmp-fabs(tmp), 2)/2;
+	} else if (MODE_OBJECTIF == 1) {
+		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+		f(mdl, depart);
+		if (tmp*mdl->var[mdl->vars-1] >= 0) {
+			return powf(f(mdl, depart)*tmp-fabs(tmp), 2)/2;
+		} else {
+			return powf(mdl->var[mdl->vars-1]*tmp - fabs(tmp), 6)/2;
+		}
+	} else {
+		ERR("Pas de mode objectif %i", MODE_OBJECTIF);
+		return 0.0;
+	}
 };
 
 void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain) {
-	float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
-	df(mdl, depart, -sqrtf(2*obj_gain)*tmp);
+	if (MODE_OBJECTIF == 0) {
+		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+		df(mdl, depart, -sqrtf(2*obj_gain)*tmp);
+	} else if (MODE_OBJECTIF == 1) {
+		//
+		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+		//
+		if (tmp*mdl->var[mdl->vars-1] >= 0) {
+			df(mdl, depart, -sqrtf(2*obj_gain)*tmp);
+		} else {
+			df(mdl, depart, powf(mdl->var[mdl->vars-1]*tmp - fabs(tmp),5)*tmp*6/2);
+		}
+	} else {
+		ERR("Pas de mode objectif %i", MODE_OBJECTIF);
+	}
 };

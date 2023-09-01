@@ -98,6 +98,8 @@ Mdl_t * cree_mdl(
 	mdl->poid = allouer_flotants(mdl->poids);
 	mdl->locd = allouer_flotants(mdl->locds);
 	//
+	memset(mdl->d_poid, 0, sizeof(float) * mdl->poids);
+	//
 	FOR(0, i, mdl->poids) {
 		mdl->poid[i] = 2*((float)(rand()%10000)/9999.0 - 0.5);
 	}
@@ -146,6 +148,10 @@ void liberer_mdl(Mdl_t * mdl) {
 	//
 	free(mdl);
 };
+
+void zero_dpoid(Mdl_t * mdl) {
+	FOR(0, p, mdl->poids) mdl->d_poid[p] = 0;
+}
 
 void ecrire_mdl(Mdl_t * mdl, char * fichier) {
 	FILE * fp = fopen(fichier, "wb");

@@ -24,4 +24,4 @@ extern float prixs[PRIXS];
 extern float ema[NB_DIFF_EMA][PRIXS];
 extern float probas_choix_ema[NB_DIFF_EMA];
 
-void charger_les_prixs();  
+void charger_les_prixs();
