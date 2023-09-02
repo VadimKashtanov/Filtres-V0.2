@@ -120,7 +120,7 @@ static float neurone_n(float * locd, float * arr, float * poid, uint n) {
 	float _somme = 0.0;
 	float tmp;
 	for (uint i=0; i < n; i++) {
-		tmp = arr[i]*poid[i/**2*/];// + poid[i*2+1];
+		tmp = arr[i]*___tanh(poid[i/**2*/]);// + poid[i*2+1];
 		locd[i] = tmp;
 		_somme += (tmp);
 	}
@@ -140,8 +140,8 @@ static void d_neurone_n(
 	float tmp;
 	for (uint i=0; i < n; i++) {
 		tmp = /*___d_tanh*/(1+0*locd[i]) * _d_somme;
-		grad[i] = tmp * poid[i/**2*/];
-		d_poid[i/**2*/] += tmp * arr[i];
+		grad[i] = tmp * ___tanh(poid[i/**2*/]);
+		d_poid[i/**2*/] += ___d_tanh(poid[i]) * tmp * arr[i];
 		//d_poid[i*2+1] += tmp;
 	}
 };
@@ -273,21 +273,32 @@ void df(Mdl_t * mdl, uint depart, float erreur) {
 	free(_dx);
 };
 
-uint MODE_OBJECTIF = 0;	//	{Objectif_gain_maximal, Reduction des Pertes}
+uint MODE_OBJECTIF = 0;	//	{Objectif_gain_maximal, Reduction des Pertes, Objectif_sens}
+
+#define EXPOSANT_REDUCTION_PERTES 2
 
 float objectif_gain(Mdl_t * mdl, uint depart) {
 	if (MODE_OBJECTIF == 0) {
+
 		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
 		return powf(f(mdl, depart)*tmp-fabs(tmp), 2)/2;
+
 	} else if (MODE_OBJECTIF == 1) {
+
 		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
 		f(mdl, depart);
 		if (tmp*mdl->var[mdl->vars-1] >= 0) {
 			return 0;//powf(f(mdl, depart)*tmp-fabs(tmp), 2)/2;
 		} else {
-			return powf(mdl->var[mdl->vars-1]*tmp - fabs(tmp), 6)/2;
+			return powf(mdl->var[mdl->vars-1]*tmp - fabs(tmp), EXPOSANT_REDUCTION_PERTES)/2;
 		}
-	} else {
+
+	} else if (MODE_OBJECTIF == 2) {
+
+		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+		return powf((f(mdl, depart)>=0 ? 1.0 : -1.0)*tmp-fabs(tmp), 2)/2;
+
+	} else { 
 		ERR("Pas de mode objectif %i", MODE_OBJECTIF);
 		return 0.0;
 	}
@@ -295,8 +306,10 @@ float objectif_gain(Mdl_t * mdl, uint depart) {
 
 void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain) {
 	if (MODE_OBJECTIF == 0) {
+
 		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
 		df(mdl, depart, -sqrtf(2*obj_gain)*tmp);
+
 	} else if (MODE_OBJECTIF == 1) {
 		//
 		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
@@ -304,8 +317,18 @@ void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain) {
 		if (tmp*mdl->var[mdl->vars-1] >= 0) {
 			df(mdl, depart, 0);//-sqrtf(2*obj_gain)*tmp);
 		} else {
-			df(mdl, depart, powf(mdl->var[mdl->vars-1]*tmp - fabs(tmp),5)*tmp*6/2);
+			df(
+				mdl,
+				depart,
+				(EXPOSANT_REDUCTION_PERTES-1)*powf(
+					mdl->var[mdl->vars-1]*tmp - fabs(tmp),EXPOSANT_REDUCTION_PERTES)*tmp/2);
 		}
+
+	} else if (MODE_OBJECTIF == 2) {
+
+		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
+		df(mdl, depart, (mdl->var[mdl->vars-1]>=0 ? 1.0 : -1.0)*tmp-fabs(tmp));
+
 	} else {
 		ERR("Pas de mode objectif %i", MODE_OBJECTIF);
 	}

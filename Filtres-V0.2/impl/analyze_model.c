@@ -87,18 +87,20 @@ void plume_mdl(Mdl_t * mdl) {
 };
 
 void verifier_derivee(Mdl_t * mdl) {
+	uint depart = DEPART + (rand()%(PRIXS-DEPART-1));
+	//
 	float _d_poid[mdl->poids];
-	float _f = objectif_gain(mdl, DEPART);
+	float _f = objectif_gain(mdl, depart);
 	const float _1E5 = 1e-4;
 
 	FOR(0, i, mdl->poids) {
 		mdl->poid[i] += _1E5;
-		_d_poid[i] = (objectif_gain(mdl, DEPART)-_f)/_1E5;
+		_d_poid[i] = (objectif_gain(mdl, depart)-_f)/_1E5;
 		mdl->poid[i] -= _1E5;
 		mdl->d_poid[i] = 0;
 	};
 
-	d_objectif_gain(mdl, DEPART, objectif_gain(mdl, DEPART));
+	d_objectif_gain(mdl, depart, objectif_gain(mdl, depart));
 	
 	FOR(0, i, mdl->poids) {
 		float a = _d_poid[i];
@@ -118,7 +120,7 @@ void verifier_derivee(Mdl_t * mdl) {
 //	===============================================================================
 
 void comportement(Mdl_t * mdl) {
-#define T 100
+#define T 50
 
 	uint depart = DEPART + (rand() % (PRIXS-DEPART-T-1));
 

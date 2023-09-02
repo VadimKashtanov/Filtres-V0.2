@@ -158,33 +158,38 @@ int main() {
 
 	MODE_OBJECTIF = 0;
 
-#define N 9
+	/*
+		Au dessus de 53%
+
+	*/
+
+#define N 2
 
 	A_t pile[N] = {
-		{.c=0,    .y=64, .n=6},
-		{.c=FLTR, .y=32, .n=4},
+		{.c=0,    .y=4, .n=6},
+		//{.c=FLTR, .y=32, .n=4},
 		//
 		//{.c=NEU,  .y=16, .n=6},
-		{.c=NEU,  .y=12, .n=7},
-		{.c=NEU,  .y=12, .n=6},
-		{.c=NEU,  .y=12, .n=4},
-		{.c=NEU,  .y=12, .n=4},
-		{.c=NEU,  .y=8, .n=5},
-		{.c=NEU,  .y=3, .n=4},
-		{.c=NEU,  .y=1, .n=3}
+		//{.c=NEU,  .y=12, .n=7},
+		//{.c=NEU,  .y=12, .n=6},
+		//{.c=NEU,  .y=12, .n=4},
+		//{.c=NEU,  .y=12, .n=4},
+		//{.c=NEU,  .y=8, .n=4},
+		//{.c=NEU,  .y=3, .n=3},
+		{.c=NEU,  .y=1, .n=4}
 	};
 	float les_alpha[] = {
 		0,
-		0,
+		//0,
 		//0.1,
 		//0.00001,
-		0.1,
-		0.1,
-		0.1,
-		0.1,
-		0.01,
-		0.01,
-		0.01
+		//0.1,
+		//0.1,
+		//0.1,
+		//0.1,
+		//0.1,
+		//0.01,
+		0.1
 	};
 
 	/*	Score selection naturelle & Optimisation
@@ -198,7 +203,8 @@ int main() {
 	Mdl_t * mdl = gen(pile, N);
 	float * filtre_alpha = filtre_alpha_mdl(mdl, les_alpha);
 
-	//verifier_derivee(mdl);
+	srand(10);
+	verifier_derivee(mdl);
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
@@ -208,14 +214,14 @@ int main() {
 	srand(0);
 	comportement(mdl);
 
-	FOR(0, i, 20) score(mdl, filtre_alpha);
+	FOR(0, i, 10) score(mdl, filtre_alpha);
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
 
 	srand(0);
 	comportement(mdl);
-	
+
 	//
 	liberer_mdl(mdl);
 };

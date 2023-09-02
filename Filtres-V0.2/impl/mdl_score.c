@@ -66,6 +66,8 @@ float score(Mdl_t * mdl, float * les_alpha) {
 
 UNE_COURBE(suivie_gains);
 UNE_COURBE(p11);
+//UNE_COURBE(pertes);
+	uint pertes = 0;
 
 	//
 	for (uint i=DEPART; i < PRIXS-1; i++) {
@@ -80,6 +82,8 @@ UNE_COURBE(p11);
 		//
 		if ((i-DEPART)%100==0) SUIVIE_COURBE(suivie_gains, gain_total);
 		//
+		//SUIVIE_COURBE(pertes, pertes[pertes_l]+(if));
+		if (_gain < 0) pertes++;
 
 		if (i % ALPHA_TOUT_LES == 0) {
 			//alpha = estimer_alpha(mdl, i, nb_tests_second);
@@ -108,7 +112,7 @@ UNE_COURBE(p11);
 	//PLUMER_LA_COURBE(suivie_gain);
 	//LIBERER_LA_COURBE(suivie_gain);
 	//
-	printf("Gain total = %f\n", gain_total);
+	printf("Gain total = %f    gains%=%f\n", gain_total, 100*(float)(PRIXS-DEPART-pertes)/(PRIXS-DEPART));
 	//
 	return score / (PRIXS-DEPART);	//Score Moyen pour que je vois. Si besoin du vrai gain, utiliser printf()
 };
