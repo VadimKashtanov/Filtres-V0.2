@@ -158,29 +158,42 @@ int main() {
 
 	MODE_OBJECTIF = 0;
 
-#define N 5
+#define N 9
 
 	A_t pile[N] = {
-		{.c=0,    .y=32, .n=6},
-		//{.c=FLTR, .y=32, .n=4},
+		{.c=0,    .y=64, .n=6},
+		{.c=FLTR, .y=32, .n=4},
 		//
 		//{.c=NEU,  .y=16, .n=6},
-		//{.c=NEU,  .y=8, .n=4},
+		{.c=NEU,  .y=12, .n=7},
 		{.c=NEU,  .y=12, .n=6},
+		{.c=NEU,  .y=12, .n=4},
+		{.c=NEU,  .y=12, .n=4},
 		{.c=NEU,  .y=8, .n=5},
 		{.c=NEU,  .y=3, .n=4},
 		{.c=NEU,  .y=1, .n=3}
 	};
 	float les_alpha[] = {
 		0,
-		//0,
+		0,
 		//0.1,
 		//0.00001,
 		0.1,
 		0.1,
 		0.1,
+		0.1,
+		0.01,
+		0.01,
 		0.01
 	};
+
+	/*	Score selection naturelle & Optimisation
+	3x - nb de reussite
+	2x - confidance (distance aux 1)
+	1x - diversitee (a quel point different de 100% achat)
+	3x - gain total
+	5x - les scores numeriques des fonctions objectif
+	*/
 	
 	Mdl_t * mdl = gen(pile, N);
 	float * filtre_alpha = filtre_alpha_mdl(mdl, les_alpha);
@@ -189,57 +202,19 @@ int main() {
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
-	//zero_dpoid(mdl);
-	//derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
 
-	//comportement(mdl);
-	//comportement(mdl);
-	//comportement(mdl);
-
-	//for (uint i=0; i < 100; i++) {
-		//FOR(0, p, mdl->poids) mdl->poid[p] = 2*rnd()-1;
-		//score(mdl, les_alpha);
-	//}
-	//srand(0);
-	//comportement(mdl);
 	printf("##################################\n");
 
-	FOR(0, i, 50) score(mdl, filtre_alpha);
-	/*score(mdl, filtre_alpha);
-	score(mdl, filtre_alpha);
-	score(mdl, filtre_alpha);
-	score(mdl, filtre_alpha);*/
+	srand(0);
+	comportement(mdl);
+
+	FOR(0, i, 20) score(mdl, filtre_alpha);
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
 
 	srand(0);
 	comportement(mdl);
-	//derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
-
-	/*//printf("%f\n", estimer_alpha(mdl, DEPART, 5));
-
-	srand(0);
-	comportement(mdl);
-	//
-	//for (uint i=0; i < 100; i++)
-	//	mise_a_jour_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
-	//
-	//getchar();
-	score(mdl);
-
-	srand(0);
-	comportement(mdl);
-
-	uint n = mdl->poids;
-
-	printf("%f\n", dp2(mdl, DEPART, 0, 0));
-	printf("%f\n", dp2(mdl, DEPART, 10, 10));
-	printf("%f\n", dp2(mdl, DEPART, n-1, n-1));
-
-	printf("%f\n", dp(mdl, DEPART, 0));
-	printf("%f\n", dp(mdl, DEPART, 10));
-	printf("%f\n", dp(mdl, DEPART, n-1));*/
 	
 	//
 	liberer_mdl(mdl);
