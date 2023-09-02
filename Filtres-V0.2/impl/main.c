@@ -166,7 +166,7 @@ int main() {
 #define N 2
 
 	A_t pile[N] = {
-		{.c=0,    .y=4, .n=6},
+		{.c=0,    .y=2, .n=6},
 		//{.c=FLTR, .y=32, .n=4},
 		//
 		//{.c=NEU,  .y=16, .n=6},
@@ -176,7 +176,7 @@ int main() {
 		//{.c=NEU,  .y=12, .n=4},
 		//{.c=NEU,  .y=8, .n=4},
 		//{.c=NEU,  .y=3, .n=3},
-		{.c=NEU,  .y=1, .n=4}
+		{.c=NEU,  .y=1, .n=2}
 	};
 	float les_alpha[] = {
 		0,
@@ -203,7 +203,7 @@ int main() {
 	Mdl_t * mdl = gen(pile, N);
 	float * filtre_alpha = filtre_alpha_mdl(mdl, les_alpha);
 
-	srand(10);
+	srand(0);
 	verifier_derivee(mdl);
 
 	zero_dpoid(mdl);
@@ -212,9 +212,9 @@ int main() {
 	printf("##################################\n");
 
 	srand(0);
-	comportement(mdl);
+	//comportement(mdl);
 
-	FOR(0, i, 10) score(mdl, filtre_alpha);
+	FOR(0, i, 5) score(mdl, filtre_alpha);
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));

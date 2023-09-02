@@ -120,7 +120,7 @@ static float neurone_n(float * locd, float * arr, float * poid, uint n) {
 	float _somme = 0.0;
 	float tmp;
 	for (uint i=0; i < n; i++) {
-		tmp = arr[i]*___tanh(poid[i/**2*/]);// + poid[i*2+1];
+		tmp = arr[i]*___tanh(10*poid[i/**2*/]);// + poid[i*2+1];
 		locd[i] = tmp;
 		_somme += (tmp);
 	}
@@ -140,8 +140,8 @@ static void d_neurone_n(
 	float tmp;
 	for (uint i=0; i < n; i++) {
 		tmp = /*___d_tanh*/(1+0*locd[i]) * _d_somme;
-		grad[i] = tmp * ___tanh(poid[i/**2*/]);
-		d_poid[i/**2*/] += ___d_tanh(poid[i]) * tmp * arr[i];
+		grad[i] = tmp * ___tanh(10*poid[i/**2*/]);
+		d_poid[i/**2*/] += 10*___d_tanh(10*poid[i]) * tmp * arr[i];
 		//d_poid[i*2+1] += tmp;
 	}
 };
@@ -327,7 +327,7 @@ void d_objectif_gain(Mdl_t * mdl, uint depart, float obj_gain) {
 	} else if (MODE_OBJECTIF == 2) {
 
 		float tmp = USDT * LEVIER * (prixs[depart+1]/prixs[depart]-1.0);
-		df(mdl, depart, (mdl->var[mdl->vars-1]>=0 ? 1.0 : -1.0)*tmp-fabs(tmp));
+		df(mdl, depart, 0*(mdl->var[mdl->vars-1]>=0 ? 1.0 : -1.0)*tmp-fabs(tmp));
 
 	} else {
 		ERR("Pas de mode objectif %i", MODE_OBJECTIF);

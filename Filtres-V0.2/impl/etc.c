@@ -25,6 +25,9 @@ inline float ___d_logistique(register float x) {return ___logistique(x)*(1 - ___
 inline float ___tanh(register float x) {return tanhf(x);};//x/(0.5 + fabs(x));};		//  x/( 0.5 + fabs(x) )
 inline float ___d_tanh(register float x) {return 1 - powf(___tanh(x), 2);};
 
+
+inline float signe(register float x) {return (x>=0 ? 1:-1);};
+
 void gnuplot(float * arr, uint len, char * titre) {
 	char buff[200];
 	//

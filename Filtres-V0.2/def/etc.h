@@ -16,6 +16,10 @@ float ___d_logistique(register float x);
 float ___tanh(register float x);			//  x/( 0.5 + fabs(x) )
 float ___d_tanh(register float x);
 
+//	====
+
+float signe(register float x);
+
 //  ========= Utilitaire =============
 
 void gnuplot(float * arr, uint len, char * titre);

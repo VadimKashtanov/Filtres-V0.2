@@ -120,7 +120,7 @@ void verifier_derivee(Mdl_t * mdl) {
 //	===============================================================================
 
 void comportement(Mdl_t * mdl) {
-#define T 50
+#define T 15
 
 	uint depart = DEPART + (rand() % (PRIXS-DEPART-T-1));
 
@@ -134,22 +134,22 @@ void comportement(Mdl_t * mdl) {
 	};
 
 	for (uint i=0; i < mdl->vars; i++) {
-		//printf("%i| ", i);
+		printf("%i| ", i);
 		for (uint t=0; t < T; t++) {
-		//	if (var_par_t[t*mdl->vars + i] >= 0) printf(" ");
-		//	printf("%f | ", var_par_t[t*mdl->vars + i]);
+			if (var_par_t[t*mdl->vars + i] >= 0) printf(" ");
+			printf("%f | ", var_par_t[t*mdl->vars + i]);
 		}
-		//printf("\n");
+		printf("\n");
 	}
 
 	//gnuplot(ema[1] + depart - 6*6, 6, "ema1");
 	//gnuplot(ema[1] + depart + T - 6*6, 6, "ema2");
 
 	//gnuplot(prixs + depart, T, "Prixs");
-	gnuplot(f_arr, T, "Valeur de f (achat vente)");
+	//gnuplot(f_arr, T, "Valeur de f (achat vente)");
 
 	//plume_mdl(mdl);
-	//plume_poids(mdl);
+	plume_poids(mdl);
 	//plume_constes(mdl);
 };
 

@@ -48,7 +48,7 @@ float estimer_alpha(Mdl_t * mdl, uint depart, uint N) {
 	return alpha;
 };
 
-#define OPTI_TOUT_LES 1000
+#define OPTI_TOUT_LES 100
 #define ALPHA_TOUT_LES 100000000000
 
 float score(Mdl_t * mdl, float * les_alpha) {
@@ -112,7 +112,7 @@ UNE_COURBE(p11);
 	//PLUMER_LA_COURBE(suivie_gain);
 	//LIBERER_LA_COURBE(suivie_gain);
 	//
-	printf("Gain total = %f    gains%=%f\n", gain_total, 100*(float)(PRIXS-DEPART-pertes)/(PRIXS-DEPART));
+	printf("Gain total = %f    gains%%=%f\n", gain_total, 100*(float)(PRIXS-DEPART-pertes)/(PRIXS-DEPART));
 	//
 	return score / (PRIXS-DEPART);	//Score Moyen pour que je vois. Si besoin du vrai gain, utiliser printf()
 };
