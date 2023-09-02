@@ -42,8 +42,8 @@ Mdl_t * generer(uint C, uint * type, uint * y, uint * n) {
 	uint _ema[y[0]];
 	
 	FOR(0, i, y[0]) {
-		_intervalles[i] = intervalles[0];//rand() % INTERVALLES];
-		_ema[i] = 0;//rand() % NB_DIFF_EMA;
+		_intervalles[i] = intervalles[rand() % INTERVALLES];
+		_ema[i] = rand() % NB_DIFF_EMA;
 	}
 	
 	Mdl_t * mdl = cree_mdl(
@@ -158,30 +158,34 @@ int main() {
 
 	MODE_OBJECTIF = 0;
 
-#define N 3
+#define N 5
 
 	A_t pile[N] = {
-		{.c=0,    .y=3, .n=6},
+		{.c=0,    .y=32, .n=6},
 		//{.c=FLTR, .y=32, .n=4},
 		//
 		//{.c=NEU,  .y=16, .n=6},
 		//{.c=NEU,  .y=8, .n=4},
-		{.c=NEU,  .y=2, .n=2},
-		{.c=NEU,  .y=1, .n=2}
+		{.c=NEU,  .y=12, .n=6},
+		{.c=NEU,  .y=8, .n=5},
+		{.c=NEU,  .y=3, .n=4},
+		{.c=NEU,  .y=1, .n=3}
 	};
 	float les_alpha[] = {
 		0,
 		//0,
 		//0.1,
 		//0.00001,
-		0.2,
-		0.1
+		0.1,
+		0.1,
+		0.1,
+		0.01
 	};
 	
 	Mdl_t * mdl = gen(pile, N);
 	float * filtre_alpha = filtre_alpha_mdl(mdl, les_alpha);
 
-	verifier_derivee(mdl);
+	//verifier_derivee(mdl);
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));
@@ -196,13 +200,15 @@ int main() {
 		//FOR(0, p, mdl->poids) mdl->poid[p] = 2*rnd()-1;
 		//score(mdl, les_alpha);
 	//}
-	srand(0);
-	comportement(mdl);
+	//srand(0);
+	//comportement(mdl);
 	printf("##################################\n");
 
+	FOR(0, i, 50) score(mdl, filtre_alpha);
+	/*score(mdl, filtre_alpha);
 	score(mdl, filtre_alpha);
-	score(mdl, les_alpha);
-	score(mdl, les_alpha);
+	score(mdl, filtre_alpha);
+	score(mdl, filtre_alpha);*/
 
 	zero_dpoid(mdl);
 	derivee_et_seconde(mdl, DEPART + (rand() % PRIXS-DEPART-1));

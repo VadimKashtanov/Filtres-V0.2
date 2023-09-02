@@ -86,7 +86,7 @@ UNE_COURBE(p11);
 			//
 			//printf("%i/%i\n", i, PRIXS);
 		};
-		SUIVIE_COURBE(p11, mdl->poid[0]);
+		SUIVIE_COURBE(p11, mdl->poid[44]);
 
 		d_objectif_gain(mdl, i, _score);
 		if (i % OPTI_TOUT_LES == 0) {
@@ -103,7 +103,7 @@ UNE_COURBE(p11);
 	}
 	//
 	//PLUMER_LA_COURBE(p11);
-	LIBERER_LA_COURBE(p11);
+	//LIBERER_LA_COURBE(p11);
 	//
 	//PLUMER_LA_COURBE(suivie_gain);
 	//LIBERER_LA_COURBE(suivie_gain);

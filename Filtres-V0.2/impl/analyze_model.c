@@ -41,7 +41,7 @@ static void plume_constes(Mdl_t * mdl) {
 static void plume_var(Mdl_t * mdl) {
 	ptr(" === vars ===\n");
 	FOR(0, i, mdl->C) {
-		ptr("#%i %s\n", i, noms[i]);
+		ptr("#%i %s\n", i, noms[mdl->type[i]]);
 		FOR(0, j, mdl->y[i]) {
 			ptr("%i| %f \n", mdl->y_depart[i] + j, mdl->var[mdl->y_depart[i] + j]);
 		}
@@ -51,7 +51,7 @@ static void plume_var(Mdl_t * mdl) {
 static void plume_grad(Mdl_t * mdl) {
 	ptr(" === grad ===\n");
 	FOR(0, i, mdl->C) {
-		ptr("#%i %s\n", i, noms[i]);
+		ptr("#%i %s\n", i, noms[mdl->type[i]]);
 		FOR(0, j, mdl->y[i]) {
 			ptr("%i| %f \n", mdl->y_depart[i] + j, mdl->d_var[mdl->y_depart[i] + j]);
 		}
@@ -147,8 +147,8 @@ void comportement(Mdl_t * mdl) {
 	gnuplot(f_arr, T, "Valeur de f (achat vente)");
 
 	//plume_mdl(mdl);
-	plume_poids(mdl);
-	plume_constes(mdl);
+	//plume_poids(mdl);
+	//plume_constes(mdl);
 };
 
 //================================================================================
